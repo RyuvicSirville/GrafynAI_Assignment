@@ -1,0 +1,101 @@
+-- ============================================================================
+-- PHASE 1: Environment Setup and Raw Data Creation
+-- ============================================================================
+
+CREATE OR REPLACE WAREHOUSE fe_wh 
+  WITH WAREHOUSE_SIZE = 'XSMALL' 
+  AUTO_SUSPEND = 60 
+  AUTO_RESUME = TRUE
+  INITIALLY_SUSPENDED = TRUE;
+
+USE WAREHOUSE fe_wh;
+
+CREATE OR REPLACE DATABASE fe_demo_db;
+USE DATABASE fe_demo_db;
+
+CREATE OR REPLACE SCHEMA fe_raw;
+CREATE OR REPLACE SCHEMA fe_features;
+CREATE OR REPLACE SCHEMA fe_store;
+
+SELECT 'Environment setup completed!' AS status;
+
+CREATE OR REPLACE TABLE fe_raw.customer_events (
+  customer_id STRING,
+  event_ts    TIMESTAMP_NTZ,
+  event_type  STRING,
+  channel     STRING,
+  amount      NUMBER(12,2)
+);
+
+SELECT 'Raw table created!' AS status;
+
+INSERT INTO fe_raw.customer_events VALUES
+  ('C001', '2024-08-01 10:00:00', 'purchase', 'web',   120.50),
+  ('C001', '2024-08-03 09:15:00', 'browse',   'web',     0.00),
+  ('C001', '2024-08-05 14:20:00', 'purchase', 'mobile',  75.10),
+  ('C001', '2024-08-07 11:30:00', 'purchase', 'web',    95.00),
+  ('C001', '2024-08-10 08:00:00', 'browse',   'mobile',   0.00),
+  ('C001', '2024-08-15 16:45:00', 'purchase', 'web',   180.00),
+  ('C001', '2024-09-01 10:00:00', 'purchase', 'web',   150.00),
+  ('C001', '2024-09-08 15:00:00', 'purchase', 'web',   200.00),
+  
+  ('C002', '2024-08-02 11:05:00', 'purchase', 'web',   220.00),
+  ('C002', '2024-08-04 16:45:00', 'refund',   'web',   -50.00),
+  ('C002', '2024-08-06 10:20:00', 'purchase', 'mobile', 150.00),
+  ('C002', '2024-08-12 14:30:00', 'purchase', 'web',   300.00),
+  ('C002', '2024-08-20 09:00:00', 'purchase', 'mobile',  95.00),
+  ('C002', '2024-09-02 11:00:00', 'purchase', 'web',   250.00),
+  
+  ('C003', '2024-08-01 08:00:00', 'browse',   'mobile',   0.00),
+  ('C003', '2024-08-03 12:00:00', 'browse',   'web',      0.00),
+  ('C003', '2024-08-06 12:30:00', 'purchase', 'web',    180.00),
+  ('C003', '2024-08-15 10:00:00', 'browse',   'mobile',   0.00),
+  ('C003', '2024-08-25 14:00:00', 'browse',   'web',      0.00),
+  ('C003', '2024-09-05 11:00:00', 'browse',   'web',      0.00),
+  
+  ('C004', '2024-08-02 14:00:00', 'purchase', 'web',    300.00),
+  ('C004', '2024-08-05 09:00:00', 'purchase', 'mobile',  50.00),
+  ('C004', '2024-08-12 15:30:00', 'purchase', 'web',    450.00),
+  ('C004', '2024-08-20 10:00:00', 'purchase', 'web',    280.00),
+  ('C004', '2024-09-03 13:00:00', 'purchase', 'mobile', 320.00),
+  
+  ('C005', '2024-08-01 10:00:00', 'browse',   'web',      0.00),
+  ('C005', '2024-08-02 15:00:00', 'purchase', 'web',    200.00),
+  ('C005', '2024-08-03 09:00:00', 'browse',   'mobile',   0.00),
+  
+  ('C006', '2024-08-04 11:00:00', 'purchase', 'web',    175.00),
+  ('C006', '2024-08-08 14:00:00', 'purchase', 'mobile',  95.00),
+  ('C006', '2024-08-15 10:00:00', 'purchase', 'web',    210.00),
+  ('C006', '2024-08-22 16:00:00', 'purchase', 'web',    135.00),
+  ('C006', '2024-09-05 12:00:00', 'purchase', 'mobile', 180.00),
+  
+  ('C007', '2024-08-05 09:00:00', 'browse',   'web',      0.00),
+  ('C007', '2024-08-06 14:00:00', 'purchase', 'web',    250.00),
+  
+  ('C008', '2024-08-06 10:00:00', 'purchase', 'web',    160.00),
+  ('C008', '2024-08-10 11:00:00', 'purchase', 'mobile', 120.00),
+  ('C008', '2024-08-18 15:00:00', 'purchase', 'web',    190.00),
+  ('C008', '2024-08-27 09:00:00', 'purchase', 'web',    140.00),
+  ('C008', '2024-09-06 14:00:00', 'purchase', 'mobile', 170.00),
+  
+  ('C009', '2024-08-07 12:00:00', 'purchase', 'web',    200.00),
+  ('C009', '2024-08-09 10:00:00', 'browse',   'mobile',   0.00),
+  ('C009', '2024-08-14 15:00:00', 'purchase', 'web',    280.00),
+  ('C009', '2024-08-21 11:00:00', 'purchase', 'mobile', 220.00),
+  ('C009', '2024-09-01 14:00:00', 'purchase', 'web',    310.00),
+  ('C009', '2024-09-07 10:00:00', 'purchase', 'mobile', 195.00),
+  
+  ('C010', '2024-08-08 09:00:00', 'browse',   'web',      0.00),
+  ('C010', '2024-08-09 15:00:00', 'purchase', 'web',    185.00),
+  
+  ('C011', '2024-08-10 10:00:00', 'purchase', 'web',    145.00),
+  ('C011', '2024-08-15 14:00:00', 'purchase', 'mobile', 175.00),
+  ('C011', '2024-08-22 11:00:00', 'purchase', 'web',    195.00),
+  ('C011', '2024-09-02 09:00:00', 'purchase', 'web',    160.00),
+  ('C011', '2024-09-09 15:00:00', 'purchase', 'mobile', 200.00);
+
+SELECT COUNT(*) AS total_records FROM fe_raw.customer_events;
+SELECT COUNT(DISTINCT customer_id) AS unique_customers FROM fe_raw.customer_events;
+
+SELECT * FROM fe_raw.customer_events ORDER BY customer_id, event_ts;
+
