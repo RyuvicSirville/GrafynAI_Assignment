@@ -13,7 +13,7 @@ The pipeline follows a 7-phase workflow model:
 ```
 Phase 1: ENVIRONMENT SETUP & RAW DATA
   - Create warehouse, database, schemas
-  - Load 47 raw customer events for 11 customers
+  - Load 113 raw customer events for 25 customers
   Output: fe_raw.customer_events table
          |
          v
@@ -30,9 +30,9 @@ Phase 3: FEATURE STORE SETUP
          |
          v
 Phase 4: TRAINING LABELS & OFFLINE FEATURE RETRIEVAL
-  - Create churn labels for 11 customers
+  - Create churn labels for 25 customers
   - Generate point-in-time correct training dataset
-  Output: fe_features.training_set (11 samples, 13 features + label)
+  Output: fe_features.training_set (25 samples, 13 features + label)
          |
          v
 Phase 5: MODEL TRAINING
@@ -44,7 +44,7 @@ Phase 5: MODEL TRAINING
          v
 Phase 6: ONLINE FEATURE RETRIEVAL & INFERENCE
   - Retrieve latest features for all customers
-  - Generate batch churn predictions (11 customers)
+  - Generate batch churn predictions (25 customers)
   Output: fe_features.inference_results table with predictions
          |
          v
@@ -64,8 +64,8 @@ Phase 7: FEATURE REFRESH & MAINTENANCE
 **Output Source:** Raw event data created in `fe_raw.customer_events`
 
 **Data Summary:**
-- Total Events: 47
-- Unique Customers: 11 (C001-C011)
+- Total Events: 113
+- Unique Customers: 25 (C001-C025)
 - Date Range: Aug 1 - Sep 9, 2024
 - Event Types: purchase, browse, refund
 - Channels: web, mobile
@@ -130,11 +130,11 @@ Phase 7: FEATURE REFRESH & MAINTENANCE
 **Output Source:** Training dataset `fe_features.training_set` + Labels `fe_raw.labels`
 
 **Training Dataset Summary:**
-- Total Samples: 11
+- Total Samples: 25
 - Features per Sample: 13
 - Label Distribution:
-  - Active (No Churn): 7 samples (63.6%)
-  - Inactive (Churn): 4 samples (36.4%)
+  - Active (No Churn): 15 samples (60%)
+  - Inactive (Churn): 10 samples (40%)
 
 **Training Data:**
 
@@ -163,8 +163,8 @@ Phase 7: FEATURE REFRESH & MAINTENANCE
 - Visualizations: `outputs/cell5_1.png` through `cell5_4.png`
 
 **Data Split:**
-- Training Set: 9 samples (80%)
-- Test Set: 2 samples (20%)
+- Training Set: 20 samples (80%)
+- Test Set: 5 samples (20%)
 - Cross-Validation: StratifiedKFold (5 folds)
 
 **Models Trained:**
@@ -196,8 +196,8 @@ RANDOM FOREST:
 **Output Source:** Predictions table `fe_features.inference_results`
 
 **Batch Prediction Summary:**
-- Total Customers Scored: 11
-- Predictions Generated: 11
+- Total Customers Scored: 25
+- Predictions Generated: 25
 - Output Format: Customer ID, Churn Probability, Prediction, Features, Timestamp
 
 **Inference Results:**
@@ -231,7 +231,7 @@ RANDOM FOREST:
 
 **Refresh Operations:**
 - Latest Feature Refresh: SUCCESS
-- Records Updated: 11 customers
+- Records Updated: 25 customers
 - Features Refreshed: All 13 engineered features
 - Timestamp: Current
 - Status: SUCCESS
@@ -244,10 +244,10 @@ RANDOM FOREST:
 
 **Solutions Implemented:**
 
-1. Dataset Expansion: 5 → 11 customers (+120%)
-2. Event Volume: 14 → 47 events (+235%)
-3. Test Set Balance: 1 sample (single class) → 2 samples (both classes)
-4. Stratified Splitting: Implements stratified 80/20 split
+1. Dataset Expansion: 5 → 25 customers (+400%)
+2. Event Volume: 14 → 113 events (+707%)
+3. Test Set Balance: 1 sample (single class) → 5 samples (both classes)
+4. Stratified Splitting: Implements stratified 80/20 split with balanced distribution (60% active, 40% churned)
 5. Cross-Validation: Added StratifiedKFold (5 folds)
 6. Metrics Validation: All metrics now in valid 0.0-1.0 range
 7. Model Persistence: Both models saved to Snowflake stage
